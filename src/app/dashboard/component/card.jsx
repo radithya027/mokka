@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState } from "react"; // Import useState
-import { useRouter } from "next/navigation"; // Import useRouter
+import React, { useState } from "react";
+import { useRouter } from "next/navigation"; 
 import { PiClockCountdownLight } from "react-icons/pi";
-import { AiOutlineEdit } from "react-icons/ai"; // Import ikon edit
+import { AiOutlineEdit } from "react-icons/ai";
 
 const TableItems = ({ title, loading }) => {
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null); // State untuk menyimpan item yang sedang diedit
-  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Detail", "Edit"]; // Tambahkan "Edit" ke header tabel
+  const [isAddModalOpen, setAddModalOpen] = useState(false); // Tambahkan state untuk modal tambah
+  const [currentItem, setCurrentItem] = useState(null);
+  const [newItem, setNewItem] = useState({ itemName: "", variant: "", ingredients: "", totalPrice: "" }); // State untuk item baru
+
+  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Detail", "Edit"];
 
   const items = [
     { id: 1, itemName: "Burger", variant: "Cheese", ingredients: "4 Ingredients", totalPrice: "$5.99" },
@@ -20,29 +23,40 @@ const TableItems = ({ title, loading }) => {
   ];
 
   const handleViewDetails = (item) => {
-    router.push(`/detail?id=${item.id}`); // Atau gunakan path yang sesuai dengan kebutuhan Anda
+    router.push(`/detail?id=${item.id}`);
   };
 
   const handleEditItem = (item) => {
-    setCurrentItem(item); // Set item yang akan diedit
-    setModalOpen(true); // Buka modal
+    setCurrentItem(item);
+    setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    setCurrentItem(null); // Reset item yang sedang diedit
+    setCurrentItem(null);
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModalOpen(false);
+    setNewItem({ itemName: "", variant: "", ingredients: "", totalPrice: "" }); // Reset item baru
   };
 
   const handleSaveChanges = () => {
-    // Implementasikan logika untuk menyimpan perubahan
-    // Misalnya, Anda bisa mengirimkan data ke API untuk memperbarui item
     console.log("Changes saved:", currentItem);
-    handleCloseModal(); // Tutup modal setelah menyimpan
+    handleCloseModal();
+  };
+
+  const handleAddNewItem = () => {
+    console.log("New item added:", newItem);
+    handleCloseAddModal();
   };
 
   return (
     <div className="w-full h-full">
       <h2 className="text-xl font-bold text-gray-700 mb-4">{title}</h2>
+      <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mb-4">
+        Add New Item
+      </button>
       <table className="w-full bg-white shadow-lg rounded-lg">
         <thead>
           <tr className="bg-gray-100 border-b">
@@ -81,10 +95,10 @@ const TableItems = ({ title, loading }) => {
                 </td>
                 <td className="py-3 px-4">
                   <button
-                    onClick={() => handleEditItem(item)} // Panggil fungsi edit
+                    onClick={() => handleEditItem(item)}
                     className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
                   >
-                    <AiOutlineEdit /> {/* Ikon edit */}
+                    <AiOutlineEdit />
                   </button>
                 </td>
               </tr>
@@ -93,71 +107,127 @@ const TableItems = ({ title, loading }) => {
         </tbody>
       </table>
 
-      {/* Modal untuk Edit Item */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-bold mb-4">Edit Item</h3>
-            <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }}>
-              <div className="mb-4">
-                <label className="block text-gray-700">Item Name:</label>
-                <input
-                  type="text"
-                  value={currentItem?.itemName}
-                  onChange={(e) => setCurrentItem({ ...currentItem, itemName: e.target.value })}
-                  className="border rounded px-3 py-2 w-full"
-                  required
-                />
+        <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title text-black">Edit Item</h5>
+                <button type="button" className="btn-close" onClick={handleCloseModal} aria-label="Close"></button>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Variant:</label>
-                <input
-                  type="text"
-                  value={currentItem?.variant}
-                  onChange={(e) => setCurrentItem({ ...currentItem, variant: e.target.value })}
-                  className="border rounded px-3 py-2 w-full"
-                  required
-                />
+              <div className="modal-body">
+                <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }}>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Item Name:</label>
+                    <input
+                      type="text"
+                      value={currentItem?.itemName}
+                      onChange={(e) => setCurrentItem({ ...currentItem, itemName: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Variant:</label>
+                    <input
+                      type="text"
+                      value={currentItem?.variant}
+                      onChange={(e) => setCurrentItem({ ...currentItem, variant: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Ingredients:</label>
+                    <input
+                      type="text"
+                      value={currentItem?.ingredients}
+                      onChange={(e) => setCurrentItem({ ...currentItem, ingredients: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Total Price:</label>
+                    <input
+                      type="text"
+                      value={currentItem?.totalPrice}
+                      onChange={(e) => setCurrentItem({ ...currentItem, totalPrice: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                </form>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Ingredients:</label>
-                <input
-                  type="text"
-                  value={currentItem?.ingredients}
-                  onChange={(e) => setCurrentItem({ ...currentItem, ingredients: e.target.value })}
-                  className="border rounded px-3 py-2 w-full"
-                  required
-                />
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Cancel</button>
+                <button type="button" className="btn btn-primary" onClick={() => { handleSaveChanges(); handleCloseModal(); }}>Save Changes</button>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Total Price:</label>
-                <input
-                  type="text"
-                  value={currentItem?.totalPrice}
-                  onChange={(e) => setCurrentItem({ ...currentItem, totalPrice: e.target.value })}
-                  className="border rounded px-3 py-2 w-full"
-                  required
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
+
+{isAddModalOpen && (
+  <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
+    <div className="modal-dialog">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title text-black">Add New Item</h5>
+          <button type="button" className="btn-close" onClick={handleCloseAddModal} aria-label="Close"></button>
+        </div>
+        <div className="modal-body">
+          <form onSubmit={(e) => { e.preventDefault(); handleAddNewItem(); }}>
+            <div className="mb-3">
+              <label className="form-label text-black">Item Name:</label>
+              <input
+                type="text"
+                value={newItem.itemName}
+                onChange={(e) => setNewItem({ ...newItem, itemName: e.target.value })}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label text-black">Variant:</label>
+              <input
+                type="text"
+                value={newItem.variant}
+                onChange={(e) => setNewItem({ ...newItem, variant: e.target.value })}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label text-black">Ingredients:</label>
+              <input
+                type="text"
+                value={newItem.ingredients}
+                onChange={(e) => setNewItem({ ...newItem, ingredients: e.target.value })}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label text-black">Total Price:</label>
+              <input
+                type="text"
+                value={newItem.totalPrice}
+                onChange={(e) => setNewItem({ ...newItem, totalPrice: e.target.value })}
+                className="form-control"
+                required
+              />
+            </div>
+          </form>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={handleCloseAddModal}>Cancel</button>
+          <button type="button" className="btn btn-primary" onClick={() => { handleAddNewItem(); handleCloseAddModal(); }}>Add Item</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
