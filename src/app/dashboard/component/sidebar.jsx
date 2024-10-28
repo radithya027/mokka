@@ -13,7 +13,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="h-screen w-[20%] bg-white p-8 flex flex-col gap-12">
+    <div className=" w-[20%] h-screen bg-white p-8 flex flex-col gap-12">
       <h1 className="text-black font-bold text-3xl">Menu</h1>
       <div className="w-full flex flex-col gap-3">
         {data.map((item, index) => (
