@@ -73,76 +73,79 @@ const TableItems = ({ title, loading }) => {
       <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mb-4">
         Add New Menu
       </button>
-      <table className="w-full bg-white shadow-lg rounded-lg">
-        <thead>
-          <tr className="bg-gray-100 border-b">
-            {tableHead.map((head, index) => (
-              <th key={index} className="py-3 px-4 text-gray-600 font-medium text-left">
-                {head}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            Array.from({ length: 5 }).map((_, index) => (
-              <tr key={index}>
-                {Array.from({ length: tableHead.length }).map((_, i) => (
-                  <td key={i} className="py-3 px-4">
-                    <Skeleton height={20} />
+      
+      <div className="bg-white shadow-lg rounded-lg p-4">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100 border-b">
+              {tableHead.map((head, index) => (
+                <th key={index} className="py-3 px-4 text-gray-600 font-medium text-left">
+                  {head}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <tr key={index}>
+                  {Array.from({ length: tableHead.length }).map((_, i) => (
+                    <td key={i} className="py-3 px-4">
+                      <Skeleton height={20} />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              currentItems.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="py-3 px-4 text-gray-700">{item.itemName}</td>
+                  <td className="py-3 px-4 text-gray-700">{item.variant}</td>
+                  <td className="py-3 px-4 text-gray-700">{item.ingredients}</td>
+                  <td className="py-3 px-4 text-gray-700">{item.totalPrice}</td>
+                  <td className="py-3 px-4 flex space-x-2">
+                    <button
+                      onClick={() => handleViewDetails(item)}
+                      className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+                    >
+                      <PiClockCountdownLight />
+                    </button>
+                    <button
+                      onClick={() => handleEditItem(item)}
+                      className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
+                    >
+                      <AiOutlineEdit />
+                    </button>
                   </td>
-                ))}
-              </tr>
-            ))
-          ) : (
-            currentItems.map((item) => (
-              <tr key={item.id} className="border-b">
-                <td className="py-3 px-4 text-gray-700">{item.itemName}</td>
-                <td className="py-3 px-4 text-gray-700">{item.variant}</td>
-                <td className="py-3 px-4 text-gray-700">{item.ingredients}</td>
-                <td className="py-3 px-4 text-gray-700">{item.totalPrice}</td>
-                <td className="py-3 px-4 flex space-x-2">
-                  <button
-                    onClick={() => handleViewDetails(item)}
-                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-                  >
-                    <PiClockCountdownLight />
-                  </button>
-                  <button
-                    onClick={() => handleEditItem(item)}
-                    className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
-                  >
-                    <AiOutlineEdit />
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
 
-      {/* Pagination Controls */}
-      <nav aria-label="Page navigation example" className="flex justify-center mt-4">
-        <ul className="pagination">
-          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-            <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-              <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
-                {index + 1}
+        {/* Pagination Controls */}
+        <nav aria-label="Page navigation example" className="flex justify-center mt-4">
+          <ul className="pagination">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
-          ))}
-          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-            <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
+                  {index + 1}
+                </a>
+              </li>
+            ))}
+            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+              <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
 
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>

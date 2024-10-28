@@ -1,45 +1,40 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; 
-import { PiClockCountdownLight } from "react-icons/pi";
+import { PiClockCountdownLight } from "react-icons/pi"; // Import your icons if needed
 import { AiOutlineEdit } from "react-icons/ai";
 
-const TableItems = ({ title, loading }) => {
-  const router = useRouter();
+const IngredientTable = ({ title, loading }) => {
+  const tableHead = ["Ingredient", "Category", "Price", "Stock", "Actions"];
+  const [ingredients, setIngredients] = useState([
+    { id: 1, name: "Beef", category: "Meat", price: "$3.00", stock: "20" },
+    { id: 2, name: "Cheese", category: "Dairy", price: "$1.00", stock: "15" },
+    { id: 3, name: "Lettuce", category: "Vegetable", price: "$0.50", stock: "30" },
+    { id: 4, name: "Tomato", category: "Vegetable", price: "$0.75", stock: "25" },
+    { id: 5, name: "Pepperoni", category: "Meat", price: "$1.50", stock: "10" },
+    { id: 6, name: "Pasta", category: "Grain", price: "$2.50", stock: "50" },
+    { id: 7, name: "Chicken", category: "Meat", price: "$2.00", stock: "15" },
+    { id: 8, name: "Ham", category: "Meat", price: "$1.50", stock: "12" },
+    { id: 9, name: "Croutons", category: "Bakery", price: "$0.50", stock: "40" },
+    { id: 10, name: "Alfredo Sauce", category: "Condiment", price: "$1.00", stock: "5 liters" },
+  ]);
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [newItem, setNewItem] = useState({ itemName: "", variant: "", ingredients: "", totalPrice: "" });
+  const [newItem, setNewItem] = useState({ name: "", category: "", price: "", stock: "" });
 
-  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Actions"];
-
-  const items = [
-    { id: 1, itemName: "Burger", variant: "Cheese", ingredients: "4 Ingredients", totalPrice: "$5.99" },
-    { id: 2, itemName: "Pizza", variant: "Pepperoni", ingredients: "3 Ingredients", totalPrice: "$8.99" },
-    { id: 3, itemName: "Salad", variant: "Caesar", ingredients: "3 Ingredients", totalPrice: "$4.99" },
-    { id: 4, itemName: "Pasta", variant: "Alfredo", ingredients: "3 Ingredients", totalPrice: "$7.99" },
-    { id: 5, itemName: "Sandwich", variant: "Ham & Cheese", ingredients: "3 Ingredients", totalPrice: "$3.99" },
-    { id: 6, itemName: "Fries", variant: "Large", ingredients: "3 Ingredients", totalPrice: "$2.99" },
-    { id: 7, itemName: "Taco", variant: "Chicken", ingredients: "4 Ingredients", totalPrice: "$6.99" },
-    { id: 8, itemName: "Sushi", variant: "Salmon", ingredients: "5 Ingredients", totalPrice: "$9.99" },
-    { id: 9, itemName: "Steak", variant: "Grilled", ingredients: "2 Ingredients", totalPrice: "$14.99" },
-    { id: 10, itemName: "Ice Cream", variant: "Vanilla", ingredients: "1 Ingredient", totalPrice: "$3.49" },
-  ];
-
-  const itemsPerPage = 5; 
+  const itemsPerPage = 5; // Number of items per page
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const totalPages = Math.ceil(ingredients.length / itemsPerPage);
 
+  // Calculate the current ingredients to display
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = items.slice(startIndex, startIndex + itemsPerPage);
+  const currentIngredients = ingredients.slice(startIndex, startIndex + itemsPerPage);
 
+  // Function to handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
-  };
-
-  const handleViewDetails = (item) => {
-    router.push(`/detail?id=${item.id}`);
   };
 
   const handleEditItem = (item) => {
@@ -54,16 +49,16 @@ const TableItems = ({ title, loading }) => {
 
   const handleCloseAddModal = () => {
     setAddModalOpen(false);
-    setNewItem({ itemName: "", variant: "", ingredients: "", totalPrice: "" });
+    setNewItem({ name: "", category: "", price: "", stock: "" }); // Reset item
   };
 
   const handleSaveChanges = () => {
-    console.log("Changes saved:", currentItem);
+    setIngredients(ingredients.map((item) => (item.id === currentItem.id ? currentItem : item)));
     handleCloseModal();
   };
 
   const handleAddNewItem = () => {
-    console.log("New item added:", newItem);
+    setIngredients([...ingredients, { ...newItem, id: ingredients.length + 1 }]);
     handleCloseAddModal();
   };
 
@@ -71,128 +66,124 @@ const TableItems = ({ title, loading }) => {
     <div className="w-full h-full">
       <h2 className="text-xl font-bold text-gray-700 mb-4">{title}</h2>
       <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mb-4">
-        Add New Menu
+        Add New Ingredient
       </button>
-      
-      <div className="bg-white shadow-lg rounded-lg p-4">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-100 border-b">
-              {tableHead.map((head, index) => (
-                <th key={index} className="py-3 px-4 text-gray-600 font-medium text-left">
-                  {head}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              Array.from({ length: 5 }).map((_, index) => (
-                <tr key={index}>
-                  {Array.from({ length: tableHead.length }).map((_, i) => (
-                    <td key={i} className="py-3 px-4">
-                      <Skeleton height={20} />
+      <div className="card mb-4 bg-white shadow-lg">
+        <div className="card-body">
+          <table className="w-full bg-white rounded-lg mb-4">
+            <thead>
+              <tr className="bg-gray-100 border-b">
+                {tableHead.map((head, index) => (
+                  <th key={index} className="py-3 px-4 text-gray-600 font-medium text-left">
+                    {head}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                Array.from({ length: itemsPerPage }).map((_, index) => (
+                  <tr key={index}>
+                    <td className="py-3 px-4">Loading...</td>
+                    <td className="py-3 px-4">Loading...</td>
+                    <td className="py-3 px-4">Loading...</td>
+                    <td className="py-3 px-4">Loading...</td>
+                    <td className="py-3 px-4">Loading...</td>
+                  </tr>
+                ))
+              ) : (
+                currentIngredients.map((ingredient) => (
+                  <tr key={ingredient.id} className="border-b">
+                    <td className="py-3 px-4 text-gray-700">{ingredient.name}</td>
+                    <td className="py-3 px-4 text-gray-700">{ingredient.category}</td>
+                    <td className="py-3 px-4 text-gray-700">{ingredient.price}</td>
+                    <td className="py-3 px-4 text-gray-700">{ingredient.stock}</td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => handleEditItem(ingredient)}
+                        className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
+                      >
+                        <AiOutlineEdit />
+                      </button>
                     </td>
-                  ))}
-                </tr>
-              ))
-            ) : (
-              currentItems.map((item) => (
-                <tr key={item.id} className="border-b">
-                  <td className="py-3 px-4 text-gray-700">{item.itemName}</td>
-                  <td className="py-3 px-4 text-gray-700">{item.variant}</td>
-                  <td className="py-3 px-4 text-gray-700">{item.ingredients}</td>
-                  <td className="py-3 px-4 text-gray-700">{item.totalPrice}</td>
-                  <td className="py-3 px-4 flex space-x-2">
-                    <button
-                      onClick={() => handleViewDetails(item)}
-                      className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-                    >
-                      <PiClockCountdownLight />
-                    </button>
-                    <button
-                      onClick={() => handleEditItem(item)}
-                      className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
-                    >
-                      <AiOutlineEdit />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
 
-        {/* Pagination Controls */}
-        <nav aria-label="Page navigation example" className="flex justify-center mt-4">
-          <ul className="pagination">
-            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-              <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            {Array.from({ length: totalPages }).map((_, index) => (
-              <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
-                  {index + 1}
+          {/* Pagination */}
+          <nav aria-label="Page navigation example" className="d-flex justify-content-center">
+            <ul className="pagination">
+              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
                 </a>
               </li>
-            ))}
-            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-              <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+                  <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
+                    {index + 1}
+                  </a>
+                </li>
+              ))}
+              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
 
+      {/* Edit Modal */}
       {isModalOpen && (
-        <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
+        <div className="modal show" style={{ display: 'block' }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title text-black">Edit Item</h5>
-                <button type="button" className="btn-close" onClick={handleCloseModal} aria-label="Close"></button>
+                <h5 className="modal-title text-black">Edit Ingredient</h5>
+                <button type="button" className="btn-close" onClick={handleCloseModal}></button>
               </div>
-              <div className="modal-body">
+              <div className="modal-body text-black">
                 <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }}>
                   <div className="mb-3">
-                    <label className="form-label text-black">Item Name:</label>
+                    <label className="form-label">Name:</label>
                     <input
                       type="text"
-                      value={currentItem?.itemName}
-                      onChange={(e) => setCurrentItem({ ...currentItem, itemName: e.target.value })}
+                      value={currentItem?.name}
+                      onChange={(e) => setCurrentItem({ ...currentItem, name: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label text-black">Variant:</label>
+                    <label className="form-label">Category:</label>
                     <input
                       type="text"
-                      value={currentItem?.variant}
-                      onChange={(e) => setCurrentItem({ ...currentItem, variant: e.target.value })}
+                      value={currentItem?.category}
+                      onChange={(e) => setCurrentItem({ ...currentItem, category: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label text-black">Ingredients:</label>
+                    <label className="form-label">Price:</label>
                     <input
                       type="text"
-                      value={currentItem?.ingredients}
-                      onChange={(e) => setCurrentItem({ ...currentItem, ingredients: e.target.value })}
+                      value={currentItem?.price}
+                      onChange={(e) => setCurrentItem({ ...currentItem, price: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label text-black">Total Price:</label>
+                    <label className="form-label">Stock:</label>
                     <input
                       type="text"
-                      value={currentItem?.totalPrice}
-                      onChange={(e) => setCurrentItem({ ...currentItem, totalPrice: e.target.value })}
+                      value={currentItem?.stock}
+                      onChange={(e) => setCurrentItem({ ...currentItem, stock: e.target.value })}
                       className="form-control"
                       required
                     />
@@ -205,57 +196,58 @@ const TableItems = ({ title, loading }) => {
         </div>
       )}
 
+      {/* Add Modal */}
       {isAddModalOpen && (
-        <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
+        <div className="modal show" style={{ display: 'block' }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title text-black">Add New Item</h5>
-                <button type="button" className="btn-close" onClick={handleCloseAddModal} aria-label="Close"></button>
+                <h5 className="modal-title text-black">Add New Ingredient</h5>
+                <button type="button" className="btn-close" onClick={handleCloseAddModal}></button>
               </div>
-              <div className="modal-body">
+              <div className="modal-body text-black">
                 <form onSubmit={(e) => { e.preventDefault(); handleAddNewItem(); }}>
                   <div className="mb-3">
-                    <label className="form-label text-black">Item Name:</label>
+                    <label className="form-label">Name:</label>
                     <input
                       type="text"
-                      value={newItem.itemName}
-                      onChange={(e) => setNewItem({ ...newItem, itemName: e.target.value })}
+                      value={newItem.name}
+                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label text-black">Variant:</label>
+                    <label className="form-label">Category:</label>
                     <input
                       type="text"
-                      value={newItem.variant}
-                      onChange={(e) => setNewItem({ ...newItem, variant: e.target.value })}
+                      value={newItem.category}
+                      onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label text-black">Ingredients:</label>
+                    <label className="form-label">Price:</label>
                     <input
                       type="text"
-                      value={newItem.ingredients}
-                      onChange={(e) => setNewItem({ ...newItem, ingredients: e.target.value })}
+                      value={newItem.price}
+                      onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label text-black">Total Price:</label>
+                    <label className="form-label">Stock:</label>
                     <input
                       type="text"
-                      value={newItem.totalPrice}
-                      onChange={(e) => setNewItem({ ...newItem, totalPrice: e.target.value })}
+                      value={newItem.stock}
+                      onChange={(e) => setNewItem({ ...newItem, stock: e.target.value })}
                       className="form-control"
                       required
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary">Add Item</button>
+                  <button type="submit" className="btn btn-primary">Add Ingredient</button>
                 </form>
               </div>
             </div>
@@ -266,4 +258,4 @@ const TableItems = ({ title, loading }) => {
   );
 };
 
-export default TableItems;
+export default IngredientTable;
