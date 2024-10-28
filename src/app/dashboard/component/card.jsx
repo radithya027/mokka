@@ -11,6 +11,7 @@ const TableItems = ({ title, loading }) => {
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [newItem, setNewItem] = useState({ itemName: "", variant: "", ingredients: "", totalPrice: "" });
+  const [searchQuery, setSearchQuery] = useState("");
 
   const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Actions"];
 
@@ -27,12 +28,21 @@ const TableItems = ({ title, loading }) => {
     { id: 10, itemName: "Ice Cream", variant: "Vanilla", ingredients: "1 Ingredient", totalPrice: "$3.49" },
   ];
 
-  const itemsPerPage = 5; 
+  const itemsPerPage = 4; 
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(items.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = items.slice(startIndex, startIndex + itemsPerPage);
+
+  // Filter items based on search query
+  const filteredItems = items.filter(item =>
+    item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.variant.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.ingredients.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.totalPrice.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const currentItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -70,11 +80,23 @@ const TableItems = ({ title, loading }) => {
   return (
     <div className="w-full h-full">
       <h2 className="text-xl font-bold text-gray-700 mb-4">{title}</h2>
-      <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mb-4">
-        Add New Menu
-      </button>
       
-      <div className="bg-white shadow-lg rounded-lg p-4">
+      {/* Button for Add Menu moved outside the card */}
+      <div className="mb-4">
+        <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded">
+          Add New Menu
+        </button>
+      </div>
+
+      <div className="bg-white text-black shadow-lg rounded-lg p-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border border-gray-300 rounded p-2 w-full mb-4"
+        />
+
         <table className="w-full">
           <thead>
             <tr className="bg-gray-100 border-b">
@@ -122,40 +144,38 @@ const TableItems = ({ title, loading }) => {
             )}
           </tbody>
         </table>
-{/* Pagination Controls */}
-<nav aria-label="Page navigation example" className="flex justify-center mt-4">
-  <div className="flex space-x-1">
-    <button
-      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-      onClick={() => handlePageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-    >
-      Prev
-    </button>
-    {Array.from({ length: totalPages }).map((_, index) => (
-      <button
-        key={index}
-        className={`min-w-9 rounded-md py-2 px-3 border text-center text-sm transition-all shadow-sm ${
-          currentPage === index + 1
-            ? "bg-[#1E3E62] text-white border-transparent"
-            : "border border-slate-300 text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62]"
-        }`}
-        onClick={() => handlePageChange(index + 1)}
-      >
-        {index + 1}
-      </button>
-    ))}
-    <button
-      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-      onClick={() => handlePageChange(currentPage + 1)}
-      disabled={currentPage === totalPages}
-    >
-      Next
-    </button>
-  </div>
-</nav>
-
-
+        
+        <nav aria-label="Page navigation example" className="flex justify-center mt-4">
+          <div className="flex space-x-1">
+            <button
+              className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                className={`min-w-9 rounded-md py-2 px-3 border text-center text-sm transition-all shadow-sm ${
+                  currentPage === index + 1
+                    ? "bg-[#1E3E62] text-white border-transparent"
+                    : "border border-slate-300 text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62]"
+                }`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </nav>
       </div>
 
       {isModalOpen && (
@@ -271,8 +291,8 @@ const TableItems = ({ title, loading }) => {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </div>
+      )}
     </div>
   );
 };

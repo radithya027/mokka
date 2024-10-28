@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 
 const IngredientTable = ({ title, loading }) => {
-  const tableHead = ["Ingredient", "Category", "Price", "Unit", "Actions"]; // Tetap sama
+  const tableHead = ["Ingredient", "Category", "Price", "Unit", "Actions"];
   const [ingredients, setIngredients] = useState([
-    { id: 1, name: "Beef", category: "Meat", price: "$3.00", unit: "grams" }, // Misalnya gram
+    { id: 1, name: "Beef", category: "Meat", price: "$3.00", unit: "grams" },
     { id: 2, name: "Cheese", category: "Dairy", price: "$1.00", unit: "grams" },
     { id: 3, name: "Lettuce", category: "Vegetable", price: "$0.50", unit: "grams" },
     { id: 4, name: "Tomato", category: "Vegetable", price: "$0.75", unit: "grams" },
@@ -15,20 +15,27 @@ const IngredientTable = ({ title, loading }) => {
     { id: 7, name: "Chicken", category: "Meat", price: "$2.00", unit: "grams" },
     { id: 8, name: "Ham", category: "Meat", price: "$1.50", unit: "grams" },
     { id: 9, name: "Croutons", category: "Bakery", price: "$0.50", unit: "grams" },
-    { id: 10, name: "Alfredo Sauce", category: "Condiment", price: "$1.00", unit: "liters" }, // Contoh liter
+    { id: 10, name: "Alfredo Sauce", category: "Condiment", price: "$1.00", unit: "liters" },
   ]);
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [newItem, setNewItem] = useState({ name: "", category: "", price: "", unit: "" }); // Tetap sama
+  const [newItem, setNewItem] = useState({ name: "", category: "", price: "", unit: "" });
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const itemsPerPage = 5; // Jumlah item per halaman
+  const itemsPerPage = 4;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(ingredients.length / itemsPerPage);
 
+  // Filter ingredients berdasarkan searchTerm
+  const filteredIngredients = ingredients.filter(ingredient =>
+    ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ingredient.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentIngredients = ingredients.slice(startIndex, startIndex + itemsPerPage);
+  const currentIngredients = filteredIngredients.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -46,7 +53,7 @@ const IngredientTable = ({ title, loading }) => {
 
   const handleCloseAddModal = () => {
     setAddModalOpen(false);
-    setNewItem({ name: "", category: "", price: "", unit: "" }); // Reset item
+    setNewItem({ name: "", category: "", price: "", unit: "" });
   };
 
   const handleAddNewItem = () => {
@@ -57,7 +64,7 @@ const IngredientTable = ({ title, loading }) => {
     setIngredients([...ingredients, { ...newItem, id: ingredients.length + 1 }]);
     handleCloseAddModal();
   };
-  
+
   const handleSaveChanges = () => {
     if (!currentItem.name || !currentItem.category || isNaN(parseFloat(currentItem.price)) || !currentItem.unit) {
       alert("Please fill out all fields correctly.");
@@ -66,7 +73,6 @@ const IngredientTable = ({ title, loading }) => {
     setIngredients(ingredients.map((item) => (item.id === currentItem.id ? currentItem : item)));
     handleCloseModal();
   };
-  
 
   return (
     <div className="w-full h-full">
@@ -74,8 +80,18 @@ const IngredientTable = ({ title, loading }) => {
       <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mb-4">
         Add New Ingredient
       </button>
+
       <div className="card mb-4 bg-white shadow-lg">
         <div className="card-body">
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search ingredients..."
+              className="border border-gray-300 rounded p-2 w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <table className="w-full bg-white rounded-lg mb-4">
             <thead>
               <tr className="bg-gray-100 border-b">
@@ -103,7 +119,7 @@ const IngredientTable = ({ title, loading }) => {
                     <td className="py-3 px-4 text-gray-700">{ingredient.name}</td>
                     <td className="py-3 px-4 text-gray-700">{ingredient.category}</td>
                     <td className="py-3 px-4 text-gray-700">{ingredient.price}</td>
-                    <td className="py-3 px-4 text-gray-700">{ingredient.unit}</td> {/* Tetap sama */}
+                    <td className="py-3 px-4 text-gray-700">{ingredient.unit}</td>
                     <td className="py-3 px-4">
                       <button
                         onClick={() => handleEditItem(ingredient)}
@@ -118,42 +134,39 @@ const IngredientTable = ({ title, loading }) => {
             </tbody>
           </table>
           <nav aria-label="Page navigation example" className="flex justify-center mt-4">
-  <div className="flex space-x-1">
-    <button
-      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-      onClick={() => handlePageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-    >
-      Prev
-    </button>
-    {Array.from({ length: totalPages }).map((_, index) => (
-      <button
-        key={index}
-        className={`min-w-9 rounded-md py-2 px-3 border text-center text-sm transition-all shadow-sm ${
-          currentPage === index + 1
-            ? "bg-[#1E3E62] text-white border-transparent"
-            : "border border-slate-300 text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62]"
-        }`}
-        onClick={() => handlePageChange(index + 1)}
-      >
-        {index + 1}
-      </button>
-    ))}
-    <button
-      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-      onClick={() => handlePageChange(currentPage + 1)}
-      disabled={currentPage === totalPages}
-    >
-      Next
-    </button>
-  </div>
-</nav>
-
-          
+            <div className="flex space-x-1">
+              <button
+                className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Prev
+              </button>
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <button
+                  key={index}
+                  className={`min-w-9 rounded-md py-2 px-3 border text-center text-sm transition-all shadow-sm ${
+                    currentPage === index + 1
+                      ? "bg-[#1E3E62] text-white border-transparent"
+                      : "border border-slate-300 text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62]"
+                  }`}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </nav>
         </div>
       </div>
 
-      {/* Edit Modal */}
       {isModalOpen && (
         <div className="modal show" style={{ display: 'block' }}>
           <div className="modal-dialog">
@@ -268,8 +281,8 @@ const IngredientTable = ({ title, loading }) => {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </div>
+      )}
     </div>
   );
 };
