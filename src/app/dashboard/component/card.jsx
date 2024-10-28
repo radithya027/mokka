@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react"; // Import useState
 import { useRouter } from "next/navigation"; // Import useRouter
 import { PiClockCountdownLight } from "react-icons/pi";
+import { AiOutlineEdit } from "react-icons/ai"; // Import ikon edit
 
 const TableItems = ({ title, loading }) => {
   const router = useRouter();
-  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Detail"];
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null); // State untuk menyimpan item yang sedang diedit
+  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Detail", "Edit"]; // Tambahkan "Edit" ke header tabel
 
   const items = [
     { id: 1, itemName: "Burger", variant: "Cheese", ingredients: "4 Ingredients", totalPrice: "$5.99" },
@@ -17,8 +20,24 @@ const TableItems = ({ title, loading }) => {
   ];
 
   const handleViewDetails = (item) => {
-    // Pindah ke halaman detail dengan ID atau informasi yang dibutuhkan
     router.push(`/detail?id=${item.id}`); // Atau gunakan path yang sesuai dengan kebutuhan Anda
+  };
+
+  const handleEditItem = (item) => {
+    setCurrentItem(item); // Set item yang akan diedit
+    setModalOpen(true); // Buka modal
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setCurrentItem(null); // Reset item yang sedang diedit
+  };
+
+  const handleSaveChanges = () => {
+    // Implementasikan logika untuk menyimpan perubahan
+    // Misalnya, Anda bisa mengirimkan data ke API untuk memperbarui item
+    console.log("Changes saved:", currentItem);
+    handleCloseModal(); // Tutup modal setelah menyimpan
   };
 
   return (
@@ -60,11 +79,85 @@ const TableItems = ({ title, loading }) => {
                     <PiClockCountdownLight />
                   </button>
                 </td>
+                <td className="py-3 px-4">
+                  <button
+                    onClick={() => handleEditItem(item)} // Panggil fungsi edit
+                    className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
+                  >
+                    <AiOutlineEdit /> {/* Ikon edit */}
+                  </button>
+                </td>
               </tr>
             ))
           )}
         </tbody>
       </table>
+
+      {/* Modal untuk Edit Item */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-4">Edit Item</h3>
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }}>
+              <div className="mb-4">
+                <label className="block text-gray-700">Item Name:</label>
+                <input
+                  type="text"
+                  value={currentItem?.itemName}
+                  onChange={(e) => setCurrentItem({ ...currentItem, itemName: e.target.value })}
+                  className="border rounded px-3 py-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Variant:</label>
+                <input
+                  type="text"
+                  value={currentItem?.variant}
+                  onChange={(e) => setCurrentItem({ ...currentItem, variant: e.target.value })}
+                  className="border rounded px-3 py-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Ingredients:</label>
+                <input
+                  type="text"
+                  value={currentItem?.ingredients}
+                  onChange={(e) => setCurrentItem({ ...currentItem, ingredients: e.target.value })}
+                  className="border rounded px-3 py-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Total Price:</label>
+                <input
+                  type="text"
+                  value={currentItem?.totalPrice}
+                  onChange={(e) => setCurrentItem({ ...currentItem, totalPrice: e.target.value })}
+                  className="border rounded px-3 py-2 w-full"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
