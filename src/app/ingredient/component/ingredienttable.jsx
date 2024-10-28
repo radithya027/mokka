@@ -1,38 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import { PiClockCountdownLight } from "react-icons/pi"; // Import your icons if needed
 import { AiOutlineEdit } from "react-icons/ai";
 
 const IngredientTable = ({ title, loading }) => {
-  const tableHead = ["Ingredient", "Category", "Price", "Stock", "Actions"];
+  const tableHead = ["Ingredient", "Category", "Price", "Unit", "Actions"]; // Tetap sama
   const [ingredients, setIngredients] = useState([
-    { id: 1, name: "Beef", category: "Meat", price: "$3.00", stock: "20" },
-    { id: 2, name: "Cheese", category: "Dairy", price: "$1.00", stock: "15" },
-    { id: 3, name: "Lettuce", category: "Vegetable", price: "$0.50", stock: "30" },
-    { id: 4, name: "Tomato", category: "Vegetable", price: "$0.75", stock: "25" },
-    { id: 5, name: "Pepperoni", category: "Meat", price: "$1.50", stock: "10" },
-    { id: 6, name: "Pasta", category: "Grain", price: "$2.50", stock: "50" },
-    { id: 7, name: "Chicken", category: "Meat", price: "$2.00", stock: "15" },
-    { id: 8, name: "Ham", category: "Meat", price: "$1.50", stock: "12" },
-    { id: 9, name: "Croutons", category: "Bakery", price: "$0.50", stock: "40" },
-    { id: 10, name: "Alfredo Sauce", category: "Condiment", price: "$1.00", stock: "5 liters" },
+    { id: 1, name: "Beef", category: "Meat", price: "$3.00", unit: "grams" }, // Misalnya gram
+    { id: 2, name: "Cheese", category: "Dairy", price: "$1.00", unit: "grams" },
+    { id: 3, name: "Lettuce", category: "Vegetable", price: "$0.50", unit: "grams" },
+    { id: 4, name: "Tomato", category: "Vegetable", price: "$0.75", unit: "grams" },
+    { id: 5, name: "Pepperoni", category: "Meat", price: "$1.50", unit: "grams" },
+    { id: 6, name: "Pasta", category: "Grain", price: "$2.50", unit: "grams" },
+    { id: 7, name: "Chicken", category: "Meat", price: "$2.00", unit: "grams" },
+    { id: 8, name: "Ham", category: "Meat", price: "$1.50", unit: "grams" },
+    { id: 9, name: "Croutons", category: "Bakery", price: "$0.50", unit: "grams" },
+    { id: 10, name: "Alfredo Sauce", category: "Condiment", price: "$1.00", unit: "liters" }, // Contoh liter
   ]);
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [newItem, setNewItem] = useState({ name: "", category: "", price: "", stock: "" });
+  const [newItem, setNewItem] = useState({ name: "", category: "", price: "", unit: "" }); // Tetap sama
 
-  const itemsPerPage = 5; // Number of items per page
+  const itemsPerPage = 5; // Jumlah item per halaman
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(ingredients.length / itemsPerPage);
 
-  // Calculate the current ingredients to display
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentIngredients = ingredients.slice(startIndex, startIndex + itemsPerPage);
 
-  // Function to handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -49,18 +46,27 @@ const IngredientTable = ({ title, loading }) => {
 
   const handleCloseAddModal = () => {
     setAddModalOpen(false);
-    setNewItem({ name: "", category: "", price: "", stock: "" }); // Reset item
-  };
-
-  const handleSaveChanges = () => {
-    setIngredients(ingredients.map((item) => (item.id === currentItem.id ? currentItem : item)));
-    handleCloseModal();
+    setNewItem({ name: "", category: "", price: "", unit: "" }); // Reset item
   };
 
   const handleAddNewItem = () => {
+    if (!newItem.name || !newItem.category || isNaN(parseFloat(newItem.price)) || !newItem.unit) {
+      alert("Please fill out all fields correctly.");
+      return;
+    }
     setIngredients([...ingredients, { ...newItem, id: ingredients.length + 1 }]);
     handleCloseAddModal();
   };
+  
+  const handleSaveChanges = () => {
+    if (!currentItem.name || !currentItem.category || isNaN(parseFloat(currentItem.price)) || !currentItem.unit) {
+      alert("Please fill out all fields correctly.");
+      return;
+    }
+    setIngredients(ingredients.map((item) => (item.id === currentItem.id ? currentItem : item)));
+    handleCloseModal();
+  };
+  
 
   return (
     <div className="w-full h-full">
@@ -97,7 +103,7 @@ const IngredientTable = ({ title, loading }) => {
                     <td className="py-3 px-4 text-gray-700">{ingredient.name}</td>
                     <td className="py-3 px-4 text-gray-700">{ingredient.category}</td>
                     <td className="py-3 px-4 text-gray-700">{ingredient.price}</td>
-                    <td className="py-3 px-4 text-gray-700">{ingredient.stock}</td>
+                    <td className="py-3 px-4 text-gray-700">{ingredient.unit}</td> {/* Tetap sama */}
                     <td className="py-3 px-4">
                       <button
                         onClick={() => handleEditItem(ingredient)}
@@ -111,29 +117,39 @@ const IngredientTable = ({ title, loading }) => {
               )}
             </tbody>
           </table>
+          <nav aria-label="Page navigation example" className="flex justify-center mt-4">
+  <div className="flex space-x-1">
+    <button
+      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+      onClick={() => handlePageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      Prev
+    </button>
+    {Array.from({ length: totalPages }).map((_, index) => (
+      <button
+        key={index}
+        className={`min-w-9 rounded-md py-2 px-3 border text-center text-sm transition-all shadow-sm ${
+          currentPage === index + 1
+            ? "bg-[#1E3E62] text-white border-transparent"
+            : "border border-slate-300 text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62]"
+        }`}
+        onClick={() => handlePageChange(index + 1)}
+      >
+        {index + 1}
+      </button>
+    ))}
+    <button
+      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+      onClick={() => handlePageChange(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+</nav>
 
-          {/* Pagination */}
-          <nav aria-label="Page navigation example" className="d-flex justify-content-center">
-            <ul className="pagination">
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
-              </li>
-              {Array.from({ length: totalPages }, (_, index) => (
-                <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-                  <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
-                    {index + 1}
-                  </a>
-                </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
+          
         </div>
       </div>
 
@@ -179,11 +195,11 @@ const IngredientTable = ({ title, loading }) => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Stock:</label>
+                    <label className="form-label">Unit:</label> {/* Tetap sama */}
                     <input
                       type="text"
-                      value={currentItem?.stock}
-                      onChange={(e) => setCurrentItem({ ...currentItem, stock: e.target.value })}
+                      value={currentItem?.unit}
+                      onChange={(e) => setCurrentItem({ ...currentItem, unit: e.target.value })}
                       className="form-control"
                       required
                     />
@@ -238,11 +254,11 @@ const IngredientTable = ({ title, loading }) => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Stock:</label>
+                    <label className="form-label">Unit:</label> {/* Tetap sama */}
                     <input
                       type="text"
-                      value={newItem.stock}
-                      onChange={(e) => setNewItem({ ...newItem, stock: e.target.value })}
+                      value={newItem.unit}
+                      onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
                       className="form-control"
                       required
                     />

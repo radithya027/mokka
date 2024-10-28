@@ -122,29 +122,40 @@ const TableItems = ({ title, loading }) => {
             )}
           </tbody>
         </table>
+{/* Pagination Controls */}
+<nav aria-label="Page navigation example" className="flex justify-center mt-4">
+  <div className="flex space-x-1">
+    <button
+      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+      onClick={() => handlePageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      Prev
+    </button>
+    {Array.from({ length: totalPages }).map((_, index) => (
+      <button
+        key={index}
+        className={`min-w-9 rounded-md py-2 px-3 border text-center text-sm transition-all shadow-sm ${
+          currentPage === index + 1
+            ? "bg-[#1E3E62] text-white border-transparent"
+            : "border border-slate-300 text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62]"
+        }`}
+        onClick={() => handlePageChange(index + 1)}
+      >
+        {index + 1}
+      </button>
+    ))}
+    <button
+      className="rounded-md border border-slate-300 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-[#1E3E62] hover:border-[#1E3E62] focus:text-white focus:bg-[#1E3E62] focus:border-[#1E3E62] active:border-[#1E3E62] active:text-white active:bg-[#1E3E62] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+      onClick={() => handlePageChange(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+</nav>
 
-        {/* Pagination Controls */}
-        <nav aria-label="Page navigation example" className="flex justify-center mt-4">
-          <ul className="pagination">
-            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-              <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            {Array.from({ length: totalPages }).map((_, index) => (
-              <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
-                  {index + 1}
-                </a>
-              </li>
-            ))}
-            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-              <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+
       </div>
 
       {isModalOpen && (
