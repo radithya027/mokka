@@ -1,10 +1,10 @@
 import React from 'react'
-import TableConsultation from './component/card'
+import TableItems from './component/card'
 
 const page = () => {
   return (
-    <div className='p-4 -mt-96' >
-              <TableConsultation />
+    <div className='bg-[#F7F7FC] w-full h-screen p-8 ' >
+              <TableItems />
     </div>
   )
 }

@@ -22,7 +22,7 @@ const TableItems = ({ title, loading }) => {
     };
 
     return (
-        <div className="overflow-auto w-full h-full">
+        <div className=" w-full h-full">
             <h2 className="text-xl font-bold text-gray-700 mb-4">{title}</h2>
             <table className="w-full bg-white shadow-lg rounded-lg">
                 <thead>
