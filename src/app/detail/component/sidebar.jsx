@@ -14,7 +14,7 @@ const Sidebar = () => {
 
   return (
     <div className="h-screen w-[20%] bg-white p-8 flex flex-col gap-12">
-      <h1 className="text-black font-bold text-3xl">Dashboard</h1>
+      <h1 className="text-black font-bold text-3xl">Detail</h1>
       <div className="w-full flex flex-col gap-3">
         {data.map((item, index) => (
           <Link href={item.href} key={index}>

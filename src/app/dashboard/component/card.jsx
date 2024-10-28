@@ -8,11 +8,11 @@ import { AiOutlineEdit } from "react-icons/ai";
 const TableItems = ({ title, loading }) => {
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isAddModalOpen, setAddModalOpen] = useState(false); // Tambahkan state untuk modal tambah
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [newItem, setNewItem] = useState({ itemName: "", variant: "", ingredients: "", totalPrice: "" }); // State untuk item baru
+  const [newItem, setNewItem] = useState({ itemName: "", variant: "", ingredients: "", totalPrice: "" });
 
-  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Detail", "Edit"];
+  const tableHead = ["Item Name", "Variant", "Ingredients", "Total Price", "Actions"];
 
   const items = [
     { id: 1, itemName: "Burger", variant: "Cheese", ingredients: "4 Ingredients", totalPrice: "$5.99" },
@@ -20,7 +20,23 @@ const TableItems = ({ title, loading }) => {
     { id: 3, itemName: "Salad", variant: "Caesar", ingredients: "3 Ingredients", totalPrice: "$4.99" },
     { id: 4, itemName: "Pasta", variant: "Alfredo", ingredients: "3 Ingredients", totalPrice: "$7.99" },
     { id: 5, itemName: "Sandwich", variant: "Ham & Cheese", ingredients: "3 Ingredients", totalPrice: "$3.99" },
+    { id: 6, itemName: "Fries", variant: "Large", ingredients: "3 Ingredients", totalPrice: "$2.99" },
+    { id: 7, itemName: "Taco", variant: "Chicken", ingredients: "4 Ingredients", totalPrice: "$6.99" },
+    { id: 8, itemName: "Sushi", variant: "Salmon", ingredients: "5 Ingredients", totalPrice: "$9.99" },
+    { id: 9, itemName: "Steak", variant: "Grilled", ingredients: "2 Ingredients", totalPrice: "$14.99" },
+    { id: 10, itemName: "Ice Cream", variant: "Vanilla", ingredients: "1 Ingredient", totalPrice: "$3.49" },
   ];
+
+  const itemsPerPage = 5; 
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = items.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const handleViewDetails = (item) => {
     router.push(`/detail?id=${item.id}`);
@@ -38,7 +54,7 @@ const TableItems = ({ title, loading }) => {
 
   const handleCloseAddModal = () => {
     setAddModalOpen(false);
-    setNewItem({ itemName: "", variant: "", ingredients: "", totalPrice: "" }); // Reset item baru
+    setNewItem({ itemName: "", variant: "", ingredients: "", totalPrice: "" });
   };
 
   const handleSaveChanges = () => {
@@ -55,7 +71,7 @@ const TableItems = ({ title, loading }) => {
     <div className="w-full h-full">
       <h2 className="text-xl font-bold text-gray-700 mb-4">{title}</h2>
       <button onClick={() => setAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mb-4">
-        Add New Item
+        Add New Menu
       </button>
       <table className="w-full bg-white shadow-lg rounded-lg">
         <thead>
@@ -79,21 +95,19 @@ const TableItems = ({ title, loading }) => {
               </tr>
             ))
           ) : (
-            items.map((item) => (
+            currentItems.map((item) => (
               <tr key={item.id} className="border-b">
                 <td className="py-3 px-4 text-gray-700">{item.itemName}</td>
                 <td className="py-3 px-4 text-gray-700">{item.variant}</td>
                 <td className="py-3 px-4 text-gray-700">{item.ingredients}</td>
                 <td className="py-3 px-4 text-gray-700">{item.totalPrice}</td>
-                <td className="py-3 px-4">
+                <td className="py-3 px-4 flex space-x-2">
                   <button
                     onClick={() => handleViewDetails(item)}
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
                   >
                     <PiClockCountdownLight />
                   </button>
-                </td>
-                <td className="py-3 px-4">
                   <button
                     onClick={() => handleEditItem(item)}
                     className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
@@ -106,6 +120,29 @@ const TableItems = ({ title, loading }) => {
           )}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <nav aria-label="Page navigation example" className="flex justify-center mt-4">
+        <ul className="pagination">
+          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+            <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+              <a className="page-link" href="#" onClick={() => handlePageChange(index + 1)}>
+                {index + 1}
+              </a>
+            </li>
+          ))}
+          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+            <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
@@ -157,77 +194,71 @@ const TableItems = ({ title, loading }) => {
                       required
                     />
                   </div>
+                  <button type="submit" className="btn btn-primary">Save Changes</button>
                 </form>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Cancel</button>
-                <button type="button" className="btn btn-primary" onClick={() => { handleSaveChanges(); handleCloseModal(); }}>Save Changes</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-{isAddModalOpen && (
-  <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
-    <div className="modal-dialog">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h5 className="modal-title text-black">Add New Item</h5>
-          <button type="button" className="btn-close" onClick={handleCloseAddModal} aria-label="Close"></button>
+      {isAddModalOpen && (
+        <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title text-black">Add New Item</h5>
+                <button type="button" className="btn-close" onClick={handleCloseAddModal} aria-label="Close"></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={(e) => { e.preventDefault(); handleAddNewItem(); }}>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Item Name:</label>
+                    <input
+                      type="text"
+                      value={newItem.itemName}
+                      onChange={(e) => setNewItem({ ...newItem, itemName: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Variant:</label>
+                    <input
+                      type="text"
+                      value={newItem.variant}
+                      onChange={(e) => setNewItem({ ...newItem, variant: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Ingredients:</label>
+                    <input
+                      type="text"
+                      value={newItem.ingredients}
+                      onChange={(e) => setNewItem({ ...newItem, ingredients: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-black">Total Price:</label>
+                    <input
+                      type="text"
+                      value={newItem.totalPrice}
+                      onChange={(e) => setNewItem({ ...newItem, totalPrice: e.target.value })}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">Add Item</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="modal-body">
-          <form onSubmit={(e) => { e.preventDefault(); handleAddNewItem(); }}>
-            <div className="mb-3">
-              <label className="form-label text-black">Item Name:</label>
-              <input
-                type="text"
-                value={newItem.itemName}
-                onChange={(e) => setNewItem({ ...newItem, itemName: e.target.value })}
-                className="form-control"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label text-black">Variant:</label>
-              <input
-                type="text"
-                value={newItem.variant}
-                onChange={(e) => setNewItem({ ...newItem, variant: e.target.value })}
-                className="form-control"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label text-black">Ingredients:</label>
-              <input
-                type="text"
-                value={newItem.ingredients}
-                onChange={(e) => setNewItem({ ...newItem, ingredients: e.target.value })}
-                className="form-control"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label text-black">Total Price:</label>
-              <input
-                type="text"
-                value={newItem.totalPrice}
-                onChange={(e) => setNewItem({ ...newItem, totalPrice: e.target.value })}
-                className="form-control"
-                required
-              />
-            </div>
-          </form>
-        </div>
-        <div className="modal-footer">
-          <button type="button" className="btn btn-secondary" onClick={handleCloseAddModal}>Cancel</button>
-          <button type="button" className="btn btn-primary" onClick={() => { handleAddNewItem(); handleCloseAddModal(); }}>Add Item</button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 };
